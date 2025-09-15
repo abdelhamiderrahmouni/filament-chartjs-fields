@@ -7,12 +7,12 @@ use Filament\Support\Concerns\HasExtraAlpineAttributes;
 
 class ChartBuilder extends Field
 {
-    use HasExtraAlpineAttributes;
-    use Concerns\HasOptions;
-    use Concerns\HasTypes;
-    use Concerns\HasHeightControls;
     use Concerns\CanBeResponsive;
     use Concerns\CanMaintainAspectRatio;
+    use Concerns\HasHeightControls;
+    use Concerns\HasOptions;
+    use Concerns\HasTypes;
+    use HasExtraAlpineAttributes;
 
     protected string $view = 'filament-chartjs-fields::forms.components.chart-builder';
 
@@ -28,8 +28,8 @@ class ChartBuilder extends Field
         $this->default(fn () => [
             'type' => $this->getDefaultChartType(),
             'data' => [
-                ["labels", "Dataset Name 1", "Dataset Name 2", "Dataset Name 3"],
-                ["label 1", 1, 3, 4]
+                ['labels', 'Dataset Name 1', 'Dataset Name 2', 'Dataset Name 3'],
+                ['label 1', 1, 3, 4],
             ],
         ]);
 
@@ -68,8 +68,8 @@ class ChartBuilder extends Field
         return [
             'type' => $state['type'] ?? $this->getDefaultChartType(),
             'data' => [
-                ["labels", "Dataset Name 1", "Dataset Name 2", "Dataset Name 3"],
-                ["label 1", 1, 3, 4]
+                ['labels', 'Dataset Name 1', 'Dataset Name 2', 'Dataset Name 3'],
+                ['label 1', 1, 3, 4],
             ],
         ];
     }
@@ -136,7 +136,7 @@ class ChartBuilder extends Field
             }
 
             return [
-                'label' => $dataset['label'] ?? ('Dataset '.($index + 1)),
+                'label' => $dataset['label'] ?? ('Dataset ' . ($index + 1)),
                 'data' => (string) $normalizedData,
                 'backgroundColor' => $dataset['backgroundColor'] ?? $this->defaultColors[$index % count($this->defaultColors)],
                 'borderColor' => $dataset['borderColor'] ?? $dataset['backgroundColor'] ?? $this->defaultColors[$index % count($this->defaultColors)],

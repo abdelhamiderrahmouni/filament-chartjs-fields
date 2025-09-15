@@ -3,14 +3,13 @@
 namespace AbdelhamidErrahmouni\ChartBuilder\Forms\Components\Concerns;
 
 use Closure;
-use Filament\Support\Concerns\EvaluatesClosures;
 use Illuminate\Contracts\Support\Arrayable;
 
 trait HasOptions
 {
     protected array $options = [];
 
-    public function options(array|Arrayable|Closure $options): static
+    public function options(array | Arrayable | Closure $options): static
     {
         $this->options = array_merge($this->getDefaultOptions(), $this->evaluate($options));
 

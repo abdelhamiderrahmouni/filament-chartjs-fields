@@ -2,15 +2,14 @@
 
 namespace AbdelhamidErrahmouni\ChartBuilder\Forms\Components\Concerns;
 
-use Filament\Support\Concerns\EvaluatesClosures;
-use Illuminate\Contracts\Support\Arrayable;
 use Closure;
+use Illuminate\Contracts\Support\Arrayable;
 
 trait HasTypes
 {
     protected array $chartTypes = ['bar', 'line', 'pie', 'doughnut', 'radar', 'polarArea'];
 
-    public function chartTypes(array|Arrayable|Closure $types): static
+    public function chartTypes(array | Arrayable | Closure $types): static
     {
         $this->chartTypes = $this->evaluate($types);
 
