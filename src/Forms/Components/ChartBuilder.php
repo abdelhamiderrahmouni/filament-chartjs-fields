@@ -27,9 +27,14 @@ class ChartBuilder extends Field
 
         $this->default(fn () => [
             'type' => $this->getDefaultChartType(),
-            'data' => [
-                ["labels", "Dataset Name 1", "Dataset Name 2", "Dataset Name 3"],
-                ["label 1", 1, 3, 4]
+            'labels' => ['Étiquette 1'],
+            'datasets' => [
+                [
+                    'label' => 'Données 1',
+                    'data' => [0],
+                    'backgroundColor' => $this->defaultColors[0],
+                    'borderColor' => $this->defaultColors[0],
+                ],
             ],
         ]);
 
@@ -67,10 +72,8 @@ class ChartBuilder extends Field
     {
         return [
             'type' => $state['type'] ?? $this->getDefaultChartType(),
-            'data' => [
-                ["labels", "Dataset Name 1", "Dataset Name 2", "Dataset Name 3"],
-                ["label 1", 1, 3, 4]
-            ],
+            'labels' => $this->normalizeLabels($state['labels'] ?? []),
+            'datasets' => $this->normalizeDatasets($state['datasets'] ?? []),
         ];
     }
 

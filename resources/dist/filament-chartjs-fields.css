@@ -6039,3 +6039,30 @@ input:focus-visible+.dark\:\[input\:focus-visible\+\&\]\:ring-white\/20:is(.dark
   padding-top: 0.5rem;
   padding-bottom: 0.5rem;
 }
+
+.fi-chart-builder table {
+  border-collapse: separate;
+  --tw-border-spacing-x: 0.5rem;
+  --tw-border-spacing-y: 0.5rem;
+  border-spacing: var(--tw-border-spacing-x) var(--tw-border-spacing-y);
+}
+
+.fi-chart-builder .fi-header {
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+}
+
+.fi-chart-builder .fi-header .fi-header-input {
+  width: 100%;
+  border-style: none;
+  background-color: transparent;
+  padding: 0px;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+
+.fi-chart-builder .fi-header .fi-header-input:focus {
+  --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);
+  --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(0px + var(--tw-ring-offset-width)) var(--tw-ring-color);
+  box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000);
+}
