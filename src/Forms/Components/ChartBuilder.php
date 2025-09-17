@@ -2,6 +2,8 @@
 
 namespace AbdelhamidErrahmouni\ChartBuilder\Forms\Components;
 
+use AbdelhamidErrahmouni\ChartBuilder\DataObjects\ChartData;
+use AbdelhamidErrahmouni\ChartBuilder\DataObjects\Dataset;
 use Filament\Forms\Components\Field;
 use Filament\Support\Concerns\HasExtraAlpineAttributes;
 
@@ -25,34 +27,19 @@ class ChartBuilder extends Field
     {
         parent::setUp();
 
-        $this->default(fn () => [
-            'type' => $this->getDefaultChartType(),
-            'labels' => ['Étiquette 1', 'Étiquette 1'],
-            'datasets' => [
-                [
-                    'label' => 'Données 1',
-                    'data' => [0, 0],
-                    'backgroundColor' => $this->defaultColors[0],
-                    'borderColor' => $this->defaultColors[0],
-                ],
-                [
-                    'label' => 'Données 2',
-                    'data' => [0, 0],
-                    'backgroundColor' => $this->defaultColors[0],
-                    'borderColor' => $this->defaultColors[0],
-                ],
-            ],
-        ]);
-
-        $this->afterStateHydrated(function (ChartBuilder $component, $state) {
-            if (is_array($state)) {
-                $component->state($this->normalizeState($state));
-            }
-        });
-
-        $this->dehydrateStateUsing(function ($state) {
-            return $this->validateAndCleanState($state);
-        });
+        $this->default(fn (): array => ChartData::make(
+                type: $this->getDefaultChartType(),
+                labels: [__("filament-chartjs-fields::chartjs-fields.label") . ' 1'],
+                datasets: [
+                    Dataset::make(
+                        label: __("filament-chartjs-fields::chartjs-fields.dataset") . ' 1',
+                        data: [0, 0],
+                        backgroundColor: $this->defaultColors[0],
+                        borderColor: $this->defaultColors[0],
+                    ),
+                ]
+            )->toArray()
+        );
     }
 
     public function getState(): array
@@ -71,100 +58,6 @@ class ChartBuilder extends Field
     public function getDefaultColors(): array
     {
         return $this->defaultColors;
-    }
-
-    // Protected helper methods
-    protected function normalizeState(array $state): array
-    {
-        return [
-            'type' => $state['type'] ?? $this->getDefaultChartType(),
-            'labels' => $this->normalizeLabels($state['labels'] ?? []),
-            'datasets' => $this->normalizeDatasets($state['datasets'] ?? []),
-        ];
-    }
-
-    protected function normalizeLabels($labels): array
-    {
-        if (is_array($labels)) {
-
-            return array_values(array_filter(array_map('trim', $labels), fn ($label) => ! empty($label)));
-        }
-
-        return [];
-    }
-
-    protected function validateAndCleanState($state): array
-    {
-        if (! is_array($state)) {
-            return [];
-        }
-
-        $cleanState = [];
-
-        // Validate chart type
-        $chartTypes = $this->getChartTypes();
-        $cleanState['type'] = in_array($state['type'] ?? null, $chartTypes)
-            ? $state['type']
-            : $this->getDefaultChartType();
-
-        // Clean labels as array
-        $cleanState['labels'] = $this->cleanLabelsArray($state['labels'] ?? []);
-
-        // Clean datasets
-        $cleanState['datasets'] = $this->cleanDatasets($state['datasets'] ?? []);
-
-        return $cleanState;
-    }
-
-    protected function cleanLabelsArray($labels): array
-    {
-        if (! is_array($labels)) {
-            return [];
-        }
-
-        return array_values(array_filter(array_map('trim', $labels)));
-    }
-
-    protected function normalizeDatasets(array $datasets): array
-    {
-        if (empty($datasets)) {
-            return [ // TODO: check if this should be empty
-                [
-                    'label' => 'Données 1',
-                    'data' => [0],
-                    'backgroundColor' => $this->defaultColors[0],
-                    'borderColor' => $this->defaultColors[0],
-                ],
-            ];
-        }
-
-        return array_map(function ($dataset, $index) {
-            return [
-                'label' => $dataset['label'] ?? ('Dataset '.($index + 1)),
-                'data' => $dataset['data'],
-                'backgroundColor' => $dataset['backgroundColor'] ?? $this->defaultColors[$index % count($this->defaultColors)],
-                'borderColor' => $dataset['borderColor'] ?? $dataset['backgroundColor'] ?? $this->defaultColors[$index % count($this->defaultColors)],
-            ];
-        }, $datasets, array_keys($datasets));
-    }
-
-    protected function cleanDatasets(array $datasets): array
-    {
-        return array_filter(array_map(function ($dataset) {
-            if (! is_array($dataset)) {
-                return null;
-            }
-
-            $cleanDataset = [
-                'label' => trim($dataset['label'] ?? ''),
-                'data' => $dataset['data'],
-                'backgroundColor' => $this->validateColor($dataset['backgroundColor'] ?? '#3b82f6'),
-                'borderColor' => $this->validateColor($dataset['borderColor'] ?? $dataset['backgroundColor'] ?? '#3b82f6'),
-            ];
-
-            // Only include datasets with valid data
-            return ! empty($cleanDataset['data']) ? $cleanDataset : null;
-        }, $datasets));
     }
 
     protected function validateColor(string $color): string

@@ -3,7 +3,10 @@
 @config '../../tailwind.config.js';
 
 .fi-chart-builder {
-    @apply grid-cols-1 lg:grid-cols-2 gap-6;
+
+    .fi-chart-builder-content {
+        @apply grid-cols-1 lg:grid-cols-2 gap-6;
+    }
 
     .color-input {
         @apply w-8 h-8;

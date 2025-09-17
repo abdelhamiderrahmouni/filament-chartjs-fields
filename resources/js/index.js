@@ -23,6 +23,9 @@ export default function chartBuilder({
         }]
     }
 
+
+    let chart = null;
+
     return {
         state: state || baseEmptyChart,
         chartTypes: chartTypes || ['line', 'bar', 'pie'],
@@ -31,7 +34,6 @@ export default function chartBuilder({
         minHeight: minHeight || '200px',
         responsive: responsive !== false,
         maintainAspectRatio: maintainAspectRatio !== false,
-        chart: null,
         chartUpdateTimeout: null,
 
         init() {
@@ -51,12 +53,18 @@ export default function chartBuilder({
             }
         },
 
-        handleLabelsChange(labelIndex) {
-            this.refreshChart();
+        handleLabelsChange(labelIndex, value) {
+            if (chart) {
+                chart.data.labels[labelIndex] = value;
+                chart.update('none');
+            }
         },
 
-        handleDatasetDataChange(datasetIndex, labelIndex) {
-            this.refreshChart();
+        handleDatasetDataChange(datasetIndex, labelIndex, value) {
+            if (chart && chart.data.datasets[datasetIndex]) {
+                chart.data.datasets[datasetIndex].data[labelIndex] = Number(value) || 0;
+                chart.update('none');
+            }
         },
 
         getLabelsCount() {
@@ -64,10 +72,6 @@ export default function chartBuilder({
         },
 
         addLabel() {
-            // Destroy existing chart to avoid Chart.js
-            // array listeners reacting to mutations
-            this.destroyChart();
-
             if (!Array.isArray(this.state.labels)) {
                 this.state.labels = [];
             }
@@ -75,7 +79,9 @@ export default function chartBuilder({
                 this.state.datasets = [];
             }
 
-            this.state.labels = [...this.state.labels, `Étiquette ${this.state.labels.length + 1}`];
+            const newLabel = `Étiquette ${this.state.labels.length + 1}`;
+
+            this.state.labels = [...this.state.labels, newLabel];
 
             this.state.datasets = this.state.datasets.map(dataset => {
                 if (!dataset) return dataset;
@@ -84,12 +90,21 @@ export default function chartBuilder({
                 return { ...dataset, data: [...data, 0] };
             });
 
-            this.refreshChart();
+            if (chart) {
+                chart.data.labels.push(newLabel);
+                chart.data.datasets.map(dataset => {
+                    if (!dataset) return dataset;
+
+                    dataset.data.push(0);
+
+                    return dataset;
+                });
+
+                chart.update('none');
+            }
         },
 
         removeLabel(index) {
-            this.destroyChart();
-
             if (Array.isArray(this.state.labels) && this.state.labels.length > 1) {
                 this.state.labels.splice(index, 1);
 
@@ -100,12 +115,19 @@ export default function chartBuilder({
                 });
             }
 
-            this.refreshChart()
+            if (chart) {
+                chart.data.labels.splice(index, 1);
+                chart.data.datasets.forEach(dataset => {
+                    if (Array.isArray(dataset.data)) {
+                        dataset.data.splice(index, 1);
+                    }
+                });
+
+                chart.update('none');
+            }
         },
 
         addDataset() {
-            this.destroyChart();
-
             if (!this.state.datasets) {
                 this.state.datasets = [];
             }
@@ -123,35 +145,34 @@ export default function chartBuilder({
             };
 
             this.state.datasets.push(newDataset);
-            this.refreshChart()
+
+            if (chart) {
+                chart.data.datasets.push({
+                    ...newDataset,
+                    data: [...newDataset.data],
+                });
+
+                chart.update('none');
+            }
         },
 
         removeDataset(index) {
-            this.destroyChart();
+            if (!Array.isArray(this.state.datasets) || this.state.datasets.length <= 1) return;
 
-            if (this.state.datasets && this.state.datasets.length > 1) {
-                this.state.datasets.splice(index, 1);
+            this.state.datasets.splice(index, 1);
+
+            if (chart) {
+                chart.data.datasets = this.state.datasets.map(ds => ({
+                    ...ds,
+                    data: Array.isArray(ds.data) ? [...ds.data] : []
+                }));
+                chart.update('none');
             }
-
-            this.refreshChart()
         },
 
         parseLabels(labels) {
             if (!labels || !Array.isArray(labels)) return [];
             return labels.filter(label => label && String(label).trim());
-        },
-
-        hasValidData() {
-            if (!this.state || !Array.isArray(this.state.labels) || !Array.isArray(this.state.datasets)) {
-                return false;
-            }
-
-            const labels = this.parseLabels(this.state.labels);
-            if (labels.length === 0 || this.state.datasets.length === 0) {
-                return false;
-            }
-
-            return this.state.datasets.every(ds => Array.isArray(ds.data) && ds.data.length === labels.length);
         },
 
         capitalizeFirst(string) {
@@ -164,26 +185,14 @@ export default function chartBuilder({
 
         initializeChart() {
             this.$nextTick(() => {
-                this.createChart();
-            });
-        },
+                this.destroyChart();
 
-        refreshChart() {
-            this.initializeChart();
-        },
+                const canvas = this.$refs.canvas;
+                if (!canvas) return;
 
-        createChart() {
-            const canvas = this.$refs.canvas;
-            if (!canvas) return;
+                let state = window.Alpine.raw(this.state);
 
-            this.destroyChart();
-
-            if (!this.hasValidData()) return;
-
-            let state = window.Alpine.raw(this.state)
-
-            try {
-                this.chart = new Chart(canvas, {
+                chart = new Chart(canvas, {
                     type: state.type,
                     data: {
                         labels: state.labels,
@@ -196,16 +205,18 @@ export default function chartBuilder({
                         animation: { duration: 0 },
                         plugins: { legend: { display: true } },
                     },
-                });
-            } catch (error) {
-                console.error('Error creating chart:', error);
-            }
+                })
+            });
+        },
+
+        refreshChart() {
+            this.initializeChart();
         },
 
         destroyChart() {
-            if (this.chart) {
-                this.chart.destroy();
-                this.chart = null;
+            if (chart) {
+                chart.destroy();
+                chart = null;
             }
         },
 
