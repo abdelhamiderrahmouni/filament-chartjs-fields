@@ -1,6 +1,6 @@
 <x-dynamic-component :component="$getFieldWrapperView()" :field="$field">
     <div  x-load
-          x-load-src="{{ \Filament\Support\Facades\FilamentAsset::getAlpineComponentSrc('forms-chart-builder') }}"
+          x-load-src="{{ \Filament\Support\Facades\FilamentAsset::getAlpineComponentSrc('filament-chartjs-fields', 'abdelhamiderrahmouni/filament-chartjs-fields') }}"
           x-data="chartBuilder({
             state: $wire.$entangle('{{ $getStatePath() }}'),
             chartTypes: @js($getChartTypes()),
@@ -55,7 +55,7 @@
 
                                     <div class="absolute right-0 top-0 h-full flex items-center gap-1 bg-white dark:bg-gray-800">
                                         <button type="button"
-                                                @click="removeDataset(datasetIndex)"
+                                                x-on:click="removeDataset(datasetIndex)"
                                                 x-show="state.datasets && state.datasets.length > 1"
                                                 class="text-red-500 hover:text-red-700 focus:outline-none text-sm p-1">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -67,7 +67,13 @@
                             </template>
                         </div>
                         <div>
-                            <div class="w-4 h-4" x-show="state.labels.length > 1"></div>
+{{--                            <div class="w-4 h-4" x-show="state.labels.length > 1"></div>--}}
+                            <button type="button" x-on:click="addDataset()"
+                                    class="inline-flex items-center font-medium text-primary-600 text-sm">
+                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                                </svg>
+                            </button>
                         </div>
                     </div>
                     <div class="space-y-2" x-show="state.labels && state.labels.length > 0">
@@ -94,7 +100,7 @@
                                                                placeholder="Dataset label">
                                                     </span>
                                                     <button type="button"
-                                                            @click="removeDataset(datasetIndex)"
+                                                            x-on:click="removeDataset(datasetIndex)"
                                                             x-show="state.datasets && state.datasets.length > 1"
                                                             class="text-red-500 hover:text-red-700 focus:outline-none text-sm">
                                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -109,7 +115,7 @@
                                                         <input type="number"
                                                                x-model="dataset.data[labelIndex]"
                                                                @input.debounce.500ms="handleDatasetDataChange(datasetIndex, labelIndex)"
-                                                               class="fi-input px-4 py-1.5 block w-full border-none text-sm text-gray-950 placeholder:text-gray-400 focus:ring-0 disabled:text-gray-500 disabled:[-webkit-text-fill-color:theme(colors.gray.500)] disabled:placeholder:[-webkit-text-fill-color:theme(colors.gray.400)] dark:text-white dark:placeholder:text-gray-500 dark:disabled:text-gray-400 dark:disabled:[-webkit-text-fill-color:theme(colors.gray.400)] dark:disabled:placeholder:[-webkit-text-fill-color:theme(colors.gray.500)] sm:text-sm sm:leading-6 bg-white/0">
+                                                               class="fi-input px-2 py-1.5 block w-full border-none text-sm text-gray-950 placeholder:text-gray-400 focus:ring-0 disabled:text-gray-500 disabled:[-webkit-text-fill-color:theme(colors.gray.500)] disabled:placeholder:[-webkit-text-fill-color:theme(colors.gray.400)] dark:text-white dark:placeholder:text-gray-500 dark:disabled:text-gray-400 dark:disabled:[-webkit-text-fill-color:theme(colors.gray.400)] dark:disabled:placeholder:[-webkit-text-fill-color:theme(colors.gray.500)] sm:text-sm sm:leading-6 bg-white/0">
                                                     </div>
                                                 </div>
                                             </div>
@@ -160,9 +166,9 @@
                                         </div>
                                     </template>
                                 </div>
-                                <div class="">
+                                <div class="fi-row-actions">
                                     <button type="button"
-                                            @click="removeLabel(labelIndex)"
+                                            x-on:click="removeLabel(labelIndex)"
                                             x-show="state.labels && state.labels.length > 1"
                                             class="text-red-500 hover:text-red-700 focus:outline-none text-sm p-1">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -173,7 +179,7 @@
                             </div>
                         </template>
                         <div class="flex items-center justify-center">
-                            <button type="button" @click="addLabel()"
+                            <button type="button" x-on:click="addLabel"
                                     class="inline-flex items-center font-medium text-primary-600 text-sm">
                                 <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
@@ -216,13 +222,7 @@
                         </div>
 
                         <div class="w-full flex justify-center items-center">
-                            <button type="button" @click="addDataset()"
-                                    class="inline-flex items-center font-medium text-primary-600 text-sm">
-                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                                </svg>
-                                Ajouter des données
-                            </button>
+
                         </div>
                     </div>
                 </div>
@@ -235,7 +235,7 @@
                 <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">Aperçu</h3>
                 <div class="flex items-center gap-2">
                     <button type="button"
-                            @click="refreshChart()"
+                            x-on:click="refreshChart()"
                             class="p-1.5 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 rounded focus:outline-none focus:ring-2 focus:ring-gray-500"
                             title="Rafraîchir le graphique">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

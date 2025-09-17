@@ -13,12 +13,13 @@ export default function chartBuilder({
     }) {
     return {
         // Initialize state with proper defaults
-        state: state || {
+        state: state || this.emptyChart,
+        emptyChart: {
             type: (chartTypes && chartTypes[0]) || 'line',
-            labels: [],
+            labels: [''],
             datasets: [{
                 label: 'Dataset 1',
-                data: '',
+                data: [0],
                 backgroundColor: (defaultColors && defaultColors[0]) || '#3b82f6',
                 borderColor: (defaultColors && defaultColors[0]) || '#3b82f6',
             }]
@@ -38,22 +39,15 @@ export default function chartBuilder({
 
             if (labelsCount > 0) {
                 this.state.datasets.forEach(dataset => {
-                    if (!dataset.data || dataset.data.trim() === '') {
-                        dataset.data = Array(labelsCount).fill(0).join(', ');
+                    if (!dataset.data || dataset.data.length === 0) {
+                        dataset.data = Array(labelsCount).fill(0);
                     }
                 });
             }
         },
 
-        initializeChart() {
-            this.$nextTick(() => {
-                this.createChart();
-            });
-        },
-
         // Handle labels change
         handleLabelsChange() {
-            this.syncDatasetsWithLabels();
             this.updateChart();
         },
 
@@ -62,36 +56,9 @@ export default function chartBuilder({
             this.updateChart();
         },
 
-        // Sync datasets data with labels count
-        syncDatasetsWithLabels() {
-            const labelsCount = this.getLabelsCount();
-
-            if (labelsCount === 0) return;
-
-            this.state.datasets.forEach(dataset => {
-                const currentData = this.parseData(dataset.data);
-
-                if (currentData.length === 0) {
-                    // Fill with zeros if no data
-                    dataset.data = Array(labelsCount).fill(0).join(', ');
-                }
-
-                if (currentData.length < labelsCount) {
-                    // Append zeros if data is shorter than labels
-                    const zerosToAdd = labelsCount - currentData.length;
-                    const newZeros = Array(zerosToAdd).fill(0);
-                    dataset.data = [...currentData, ...newZeros].join(', ');
-                }
-            });
-        },
-
         // Get labels count
         getLabelsCount() {
             return this.parseLabels(this.state.labels).length;
-        },
-
-        getDatasetLength(dataset) {
-            return this.parseData(dataset.data).length;
         },
 
         addLabel() {
@@ -101,31 +68,29 @@ export default function chartBuilder({
 
             this.state.labels.push(`Étiquette ${this.state.labels.length + 1}`);
             this.state.datasets.forEach(dataset => {
-                const wasString = typeof dataset.data === 'string';
-                let dataArr = wasString
-                    ? this.parseData(dataset.data)
-                    : Array.isArray(dataset.data) ? dataset.data.slice() : [];
-
-                const newIndex = this.state.labels.length - 1;
-                while (dataArr.length <= newIndex) dataArr.push(0);
-                dataArr[newIndex] = 0;
-
-                dataset.data = wasString ? dataArr.join(', ') : dataArr;
+                dataset.data.push(0);
             });
 
-            this.$nextTick(() => {
-                // Focus on the new input
-                const inputs = this.$el.querySelectorAll('input[x-model*="state.labels*"]');
-                if (inputs.length > 0) {
-                    inputs[inputs.length - 1].focus();
-                }
-            });
+            // TODO: Focus on the new input after adding a label
+            // this.$nextTick(() => {
+            //     // Focus on the new input
+            //     const inputs = this.$el.querySelectorAll('input[x-model*="state.labels*"]');
+            //     if (inputs.length > 0) {
+            //         inputs[inputs.length - 1].focus();
+            //     }
+            // });
         },
 
         removeLabel(index) {
             if (Array.isArray(this.state.labels) && this.state.labels.length > 1) {
                 this.state.labels.splice(index, 1);
-                this.syncDatasetsWithLabels();
+
+                this.state.datasets.forEach(dataset => {
+                    if (Array.isArray(dataset.data)) {
+                        dataset.data.splice(index, 1);
+                    }
+                });
+
                 this.updateChart();
             }
         },
@@ -136,14 +101,15 @@ export default function chartBuilder({
             }
 
             const nextIndex = this.state.datasets.length;
-            const colorIndex = nextIndex % defaultColors.length;
+            const palette = Array.isArray(defaultColors) && defaultColors.length ? defaultColors : ['#3b82f6', '#10b981', '#f59e0b', '#ef4444'];
+            const colorIndex = nextIndex % palette.length;
             const labelsCount = this.getLabelsCount();
 
             const newDataset = {
                 label: `Dataset ${nextIndex + 1}`,
-                data: labelsCount > 0 ? Array(labelsCount).fill(0).join(', ') : '',
-                backgroundColor: defaultColors[colorIndex],
-                borderColor: defaultColors[colorIndex],
+                data: labelsCount > 0 ? Array(labelsCount).fill(0) : [],
+                backgroundColor: palette[colorIndex],
+                borderColor: palette[colorIndex],
             };
 
             this.state.datasets.push(newDataset);
@@ -155,6 +121,52 @@ export default function chartBuilder({
                 this.state.datasets.splice(index, 1);
                 this.$nextTick(() => this.updateChart());
             }
+        },
+
+        getChartData() {
+            if (!this.state) {
+                return { labels: [], datasets: [] };
+            }
+
+            let state = window.Alpine.raw(this.state)
+
+            return { labels: state.labels, datasets: state.datasets };
+        },
+
+        parseLabels(labels) {
+            if (!labels || !Array.isArray(labels)) return [];
+            return labels.filter(label => label && String(label).trim());
+        },
+
+        hasValidData() {
+            if (!this.state || !Array.isArray(this.state.labels) || !Array.isArray(this.state.datasets)) {
+                return false;
+            }
+
+            const labels = this.parseLabels(this.state.labels);
+            if (labels.length === 0 || this.state.datasets.length === 0) {
+                return false;
+            }
+
+            return this.state.datasets.every(ds => Array.isArray(ds.data) && ds.data.length === labels.length);
+        },
+
+        capitalizeFirst(string) {
+            return string.charAt(0).toUpperCase() + string.slice(1);
+        },
+
+        //
+        // Chart methods
+        //
+
+        initializeChart() {
+            this.$nextTick(() => {
+                this.createChart();
+            });
+        },
+
+        refreshChart() {
+            this.initializeChart();
         },
 
         createChart() {
@@ -178,15 +190,9 @@ export default function chartBuilder({
                         ...this.options,
                         responsive: this.responsive,
                         maintainAspectRatio: this.maintainAspectRatio,
-                        animation: {
-                            duration: 0 // Disable animations to prevent issues
-                        },
-                        plugins: {
-                            legend: {
-                                display: true
-                            }
-                        }
-                    }
+                        animation: { duration: 0 },
+                        plugins: { legend: { display: true } },
+                    },
                 });
             } catch (error) {
                 console.error('Error creating chart:', error);
@@ -207,74 +213,11 @@ export default function chartBuilder({
 
                 try {
                     this.chart.data = this.getChartData();
-                    this.createChart();
+                    this.chart.update('none');
                 } catch (error) {
                     console.error('Error updating chart:', error);
-                    this.createChart();
                 }
             });
-        },
-
-        refreshChart() {
-            this.createChart();
-        },
-
-        getChartData() {
-            if (!this.state) {
-                return { labels: [], datasets: [] };
-            }
-
-            const labels = this.parseLabels(this.state.labels);
-
-            const datasets = (this.state.datasets || []).map(dataset => {
-                const data = this.parseData(dataset.data);
-                return {
-                    label: dataset.label || 'Dataset',
-                    data: data,
-                    backgroundColor: dataset.backgroundColor || '#3b82f6',
-                    borderColor: dataset.borderColor || dataset.backgroundColor || '#3b82f6',
-                    borderWidth: ['pie', 'doughnut'].includes(this.state.type) ? 0 : 2,
-                    fill: this.state.type !== 'line',
-                };
-            });
-
-            return { labels, datasets };
-        },
-
-        parseLabels(labels) {
-            if (!labels || !Array.isArray(labels))
-                return [];
-
-            return labels.filter(label => label && label.trim());
-        },
-
-        parseData(dataString) {
-            if (!dataString || typeof dataString !== 'string') return [];
-
-            return dataString.split(',')
-                .map(value => parseFloat(value.trim()))
-                .filter(value => !isNaN(value));
-        },
-
-        hasValidData() {
-            console.log('Checking for valid data...', this.state, this.state?.labels, this.state?.datasets);
-
-            if (!this.state || !this.state.labels || !this.state.datasets) {
-                return false;
-            }
-
-            const labels = this.parseLabels(this.state.labels);
-
-            const hasValidDatasets = this.state.datasets.some(dataset => {
-                const data = this.parseData(dataset.data);
-                return data.length > 0;
-            });
-
-            return labels.length > 0 && hasValidDatasets;
-        },
-
-        capitalizeFirst(string) {
-            return string.charAt(0).toUpperCase() + string.slice(1);
         },
 
         // Cleanup when component is destroyed

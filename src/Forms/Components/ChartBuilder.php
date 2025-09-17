@@ -27,11 +27,17 @@ class ChartBuilder extends Field
 
         $this->default(fn () => [
             'type' => $this->getDefaultChartType(),
-            'labels' => ['Étiquette 1'],
+            'labels' => ['Étiquette 1', 'Étiquette 1'],
             'datasets' => [
                 [
                     'label' => 'Données 1',
-                    'data' => [0],
+                    'data' => [0, 0],
+                    'backgroundColor' => $this->defaultColors[0],
+                    'borderColor' => $this->defaultColors[0],
+                ],
+                [
+                    'label' => 'Données 2',
+                    'data' => [0, 0],
                     'backgroundColor' => $this->defaultColors[0],
                     'borderColor' => $this->defaultColors[0],
                 ],
@@ -122,7 +128,7 @@ class ChartBuilder extends Field
     protected function normalizeDatasets(array $datasets): array
     {
         if (empty($datasets)) {
-            return [
+            return [ // TODO: check if this should be empty
                 [
                     'label' => 'Données 1',
                     'data' => [0],
@@ -133,14 +139,9 @@ class ChartBuilder extends Field
         }
 
         return array_map(function ($dataset, $index) {
-            $normalizedData = $dataset['data'] ?? '';
-            if (is_array($normalizedData)) {
-                $normalizedData = implode(', ', $normalizedData);
-            }
-
             return [
                 'label' => $dataset['label'] ?? ('Dataset '.($index + 1)),
-                'data' => (string) $normalizedData,
+                'data' => $dataset['data'],
                 'backgroundColor' => $dataset['backgroundColor'] ?? $this->defaultColors[$index % count($this->defaultColors)],
                 'borderColor' => $dataset['borderColor'] ?? $dataset['backgroundColor'] ?? $this->defaultColors[$index % count($this->defaultColors)],
             ];

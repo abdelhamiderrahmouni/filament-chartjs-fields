@@ -28,4 +28,8 @@
             @apply w-full border-none p-0 bg-transparent text-sm focus:ring-0;
         }
     }
+
+    .fi-row-actions {
+        @apply min-w-4;
+    }
 }
