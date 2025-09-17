@@ -157,7 +157,7 @@ class ChartBuilder extends Field
 
             $cleanDataset = [
                 'label' => trim($dataset['label'] ?? ''),
-                'data' => $this->cleanDataString($dataset['data'] ?? ''),
+                'data' => $dataset['data'],
                 'backgroundColor' => $this->validateColor($dataset['backgroundColor'] ?? '#3b82f6'),
                 'borderColor' => $this->validateColor($dataset['borderColor'] ?? $dataset['backgroundColor'] ?? '#3b82f6'),
             ];
@@ -165,19 +165,6 @@ class ChartBuilder extends Field
             // Only include datasets with valid data
             return ! empty($cleanDataset['data']) ? $cleanDataset : null;
         }, $datasets));
-    }
-
-    protected function cleanDataString(string $data): array
-    {
-        if (empty(trim($data))) {
-            return [];
-        }
-
-        return array_filter(array_map(function ($value) {
-            $cleaned = trim($value);
-
-            return is_numeric($cleaned) ? (float) $cleaned : null;
-        }, explode(',', $data)), fn ($value) => $value !== null);
     }
 
     protected function validateColor(string $color): string

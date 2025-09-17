@@ -11,7 +11,6 @@
             responsive: @js($isResponsive()),
             maintainAspectRatio: @js($shouldMaintainAspectRatio())
         })"
-          x-init="initializeChart()"
           class="fi-chart-builder grid"
           x-ref="chart_builder"
           x-cloak>
@@ -33,7 +32,7 @@
                             Type
                         </label>
                         <select x-model="state.type"
-                                @change="updateChart()"
+                                @change="refreshChart()"
                                 class="w-full block rounded-md border-gray-300 dark:bg-gray-800 dark:border-gray-700 focus:border-primary-500 focus:ring focus:ring-primary-200 focus:ring-opacity-50 text-sm">
                             <template x-for="type in chartTypes" :key="type">
                                 <option :value="type" x-text="capitalizeFirst(type)"></option>
@@ -84,31 +83,13 @@
                                         <div class="fi-input-wrp-input min-w-0 flex-1">
                                             <input type="text"
                                                    x-model="state.labels[labelIndex]"
-                                                   @input.debounce.500ms="handleLabelsChange()"
+                                                   @input.debounce.500ms="handleLabelsChange(labelIndex)"
                                                    class="fi-input px-4 py-1.5 block w-full border-none text-sm text-gray-950 placeholder:text-gray-400 focus:ring-0 disabled:text-gray-500 disabled:[-webkit-text-fill-color:theme(colors.gray.500)] disabled:placeholder:[-webkit-text-fill-color:theme(colors.gray.400)] dark:text-white dark:placeholder:text-gray-500 dark:disabled:text-gray-400 dark:disabled:[-webkit-text-fill-color:theme(colors.gray.400)] dark:disabled:placeholder:[-webkit-text-fill-color:theme(colors.gray.500)] sm:text-sm sm:leading-6 bg-white/0"
                                                    :placeholder="`Label ${labelIndex + 1}`">
                                         </div>
                                     </div>
                                     <template x-for="(dataset, datasetIndex) in (state.datasets || [])" :key="datasetIndex">
                                         <div>
-                                            {{-- <div class="flex items-center justify-between mb-2 gap-x-2">
-                                                    <span class="w-full text-sm font-medium text-gray-700 dark:text-gray-300">
-                                                        <input type="text"
-                                                               x-model="dataset.label"
-                                                               @input.debounce.500ms="updateChart()"
-                                                               class="w-full border-none p-0 bg-transparent text-sm focus:ring-0"
-                                                               placeholder="Dataset label">
-                                                    </span>
-                                                    <button type="button"
-                                                            x-on:click="removeDataset(datasetIndex)"
-                                                            x-show="state.datasets && state.datasets.length > 1"
-                                                            class="text-red-500 hover:text-red-700 focus:outline-none text-sm">
-                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                                                        </svg>
-                                                    </button>
-                                                </div>--}}
-
                                             <div class="flex flex-col gap-1">
                                                 <div class="fi-input-wrp flex rounded-lg shadow-sm ring-1 transition duration-75 bg-white dark:bg-white/5 [&:not(:has(.fi-ac-action:focus))]:focus-within:ring-2 fi-fo-text-input overflow-hidden ring-gray-950/10 dark:ring-white/20 [&:not(:has(.fi-ac-action:focus))]:focus-within:ring-primary-600 dark:[&:not(:has(.fi-ac-action:focus))]:focus-within:ring-primary-500">
                                                     <div class="fi-input-wrp-input min-w-0">
@@ -128,13 +109,13 @@
                                                     <div class="flex items-center gap-1">
                                                         <input type="color"
                                                                x-model="dataset.backgroundColor"
-                                                               @input="updateChart()"
+                                                               @input="refreshChart()"
                                                                class="color-input flex-shrink-0 rounded border border-gray-300 dark:border-gray-600 cursor-pointer">
                                                         <div class="fi-input-wrp flex rounded-lg shadow-sm ring-1 transition duration-75 bg-white dark:bg-white/5 [&:not(:has(.fi-ac-action:focus))]:focus-within:ring-2 fi-fo-text-input overflow-hidden ring-gray-950/10 dark:ring-white/20 [&:not(:has(.fi-ac-action:focus))]:focus-within:ring-primary-600 dark:[&:not(:has(.fi-ac-action:focus))]:focus-within:ring-primary-500">
                                                             <div class="fi-input-wrp-input min-w-0 flex-1">
                                                                 <input type="text"
                                                                        x-model="dataset.backgroundColor"
-                                                                       @input.debounce.500ms="updateChart()"
+                                                                       @input.debounce.500ms="refreshChart()"
                                                                        class="fi-input px-2 py-0.5 block w-full border-none text-sm text-gray-950 placeholder:text-gray-400 focus:ring-0 disabled:text-gray-500 disabled:[-webkit-text-fill-color:theme(colors.gray.500)] disabled:placeholder:[-webkit-text-fill-color:theme(colors.gray.400)] dark:text-white dark:placeholder:text-gray-500 dark:disabled:text-gray-400 dark:disabled:[-webkit-text-fill-color:theme(colors.gray.400)] dark:disabled:placeholder:[-webkit-text-fill-color:theme(colors.gray.500)] sm:text-sm sm:leading-6 bg-white/0"
                                                                        placeholder="e.g. 10, 20, 30, 40">
                                                             </div>
@@ -149,13 +130,13 @@
                                                     <div class="flex items-center gap-1">
                                                         <input type="color"
                                                                x-model="dataset.borderColor"
-                                                               @input="updateChart()"
+                                                               @input="refreshChart()"
                                                                class="color-input flex-shrink-0 rounded border border-gray-300 dark:border-gray-600 cursor-pointer">
                                                         <div class="fi-input-wrp flex rounded-lg shadow-sm ring-1 transition duration-75 bg-white dark:bg-white/5 [&:not(:has(.fi-ac-action:focus))]:focus-within:ring-2 fi-fo-text-input overflow-hidden ring-gray-950/10 dark:ring-white/20 [&:not(:has(.fi-ac-action:focus))]:focus-within:ring-primary-600 dark:[&:not(:has(.fi-ac-action:focus))]:focus-within:ring-primary-500">
                                                             <div class="fi-input-wrp-input min-w-0 flex-1">
                                                                 <input type="text"
                                                                        x-model="dataset.borderColor"
-                                                                       @input.debounce.500ms="updateChart()"
+                                                                       @input.debounce.500ms="refreshChart()"
                                                                        class="fi-input px-2 py-0.5 block w-full border-none text-sm text-gray-950 placeholder:text-gray-400 focus:ring-0 disabled:text-gray-500 disabled:[-webkit-text-fill-color:theme(colors.gray.500)] disabled:placeholder:[-webkit-text-fill-color:theme(colors.gray.400)] dark:text-white dark:placeholder:text-gray-500 dark:disabled:text-gray-400 dark:disabled:[-webkit-text-fill-color:theme(colors.gray.400)] dark:disabled:placeholder:[-webkit-text-fill-color:theme(colors.gray.500)] sm:text-sm sm:leading-6 bg-white/0"
                                                                        placeholder="e.g. 10, 20, 30, 40">
                                                             </div>
@@ -179,50 +160,13 @@
                             </div>
                         </template>
                         <div class="flex items-center justify-center">
-                            <button type="button" x-on:click="addLabel"
+                            <button type="button" x-on:click="addLabel()"
                                     class="inline-flex items-center font-medium text-primary-600 text-sm">
                                 <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                                 </svg>
                                 Ajouter une étiquette
                             </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Datasets Configuration -->
-                <div>
-                    <div class="flex justify-between">
-                        <label class="block text-sm font-medium text-gray-600 dark:text-gray-400">
-                            Données
-                        </label>
-
-                        <div>
-                            <button type="button" x-on:click="$refs.datasets_container.classList.add('flex', 'flex-col', 'gap-6'); $refs.datasets_container.classList.remove('datasets-container')" aria-label="List layout">
-                                <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 4m0 2a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2z" /><path d="M4 12l16 0" /></svg>
-                            </button>
-                            <button type="button" x-on:click="$refs.datasets_container.classList.remove('flex', 'flex-col', 'gap-6'); $refs.datasets_container.classList.add('datasets-container')" aria-label="Grid layout">
-                                <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 4m0 1a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v4a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z" /><path d="M14 4m0 1a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v4a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z" /><path d="M4 14m0 1a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v4a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z" /><path d="M14 14m0 1a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v4a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z" /></svg>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="space-y-4">
-                        <div class="datasets-container" x-ref="datasets_container" x-show="state.datasets && state.datasets.length > 0">
-
-                        </div>
-
-                        <div x-show="!state.datasets || state.datasets.length === 0"
-                             class="text-center py-6 text-gray-500 dark:text-gray-400">
-                            <svg class="w-16 h-16 mx-auto mb-2 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-                            </svg>
-                            <p class="text-sm">Aucun données configuré</p>
-                            <p class="text-xs">Cliquez sur « Ajouter des données » pour commencer</p>
-                        </div>
-
-                        <div class="w-full flex justify-center items-center">
-
                         </div>
                     </div>
                 </div>
