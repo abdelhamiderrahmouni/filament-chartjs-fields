@@ -33,7 +33,7 @@ class ChartBuilder extends Field
                 datasets: [
                     Dataset::make(
                         label: __("filament-chartjs-fields::common.dataset") . ' 1',
-                        data: [0, 0],
+                        data: [0],
                         backgroundColor: $this->defaultColors[0],
                         borderColor: $this->defaultColors[0],
                     ),

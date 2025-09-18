@@ -68,40 +68,26 @@ export default function chartBuilder({
             }
         },
 
-        addLabel() {
-            if (!Array.isArray(this.state.labels)) {
-                this.state.labels = [];
-            }
-            if (!Array.isArray(this.state.datasets)) {
-                this.state.datasets = [];
-            }
+	    addLabel() {
+		    if (!Array.isArray(this.state.labels)) this.state.labels = [];
+		    if (!Array.isArray(this.state.datasets)) this.state.datasets = [];
 
-            const newLabel = `Étiquette ${this.state.labels.length + 1}`;
+		    const newLabel = `Étiquette ${this.state.labels.length + 1}`;
 
-            this.state.labels = [...this.state.labels, newLabel];
+		    this.state.labels = [...this.state.labels, newLabel];
 
-            this.state.datasets = this.state.datasets.map(dataset => {
-                if (!dataset) return dataset;
+		    this.state.datasets = this.state.datasets.map(ds => ({
+			    ...ds,
+			    data: [...(Array.isArray(ds.data) ? ds.data : []), 0],
+		    }));
 
-                const data = Array.isArray(dataset.data) ? dataset.data : [];
-                return { ...dataset, data: [...data, 0] };
-            });
-
-			let chart = this.getChart();
-
-            if (chart) {
-                chart.data.labels.push(newLabel);
-                chart.data.datasets.map(dataset => {
-                    if (!dataset) return dataset;
-
-                    dataset.data.push(0);
-
-                    return dataset;
-                });
-
-                chart.update('resize');
-            }
-        },
+		    const chart = this.getChart();
+		    if (chart) {
+			    chart.data.labels = [...this.state.labels];
+			    chart.data.datasets = this.state.datasets.map(ds => ({ ...ds, data: [...ds.data] }));
+			    chart.update('resize');
+		    }
+	    },
 
         removeLabel(index) {
             if (Array.isArray(this.state.labels) && this.state.labels.length > 1) {
@@ -128,55 +114,47 @@ export default function chartBuilder({
             }
         },
 
-        addDataset() {
-            if (! this.state.datasets) {
-                this.state.datasets = [];
-            }
+	    addDataset() {
+		    const current = Array.isArray(this.state.datasets) ? this.state.datasets : [];
+		    const palette = Array.isArray(defaultColors) && defaultColors.length
+			    ? defaultColors
+			    : ['#3b82f6', '#10b981', '#f59e0b', '#ef4444'];
 
-            const nextIndex = this.state.datasets.length;
-            const palette = Array.isArray(defaultColors) && defaultColors.length
-	            ? defaultColors
-	            : ['#3b82f6', '#10b981', '#f59e0b', '#ef4444'];
-            const colorIndex = nextIndex % palette.length;
-            const labelsCount = this.state.labels.length;
+		    const nextIndex = current.length;
+		    const color = palette[nextIndex % palette.length];
+		    const labelsCount = Array.isArray(this.state.labels) ? this.state.labels.length : 0;
 
-            const newDataset = {
-                label: `Dataset ${nextIndex + 1}`,
-                data: labelsCount > 0 ? Array(labelsCount).fill(0) : [],
-                backgroundColor: palette[colorIndex],
-                borderColor: palette[colorIndex],
-            };
+		    const newDataset = {
+			    label: `Dataset ${nextIndex + 1}`,
+			    data: Array(labelsCount).fill(0),
+			    backgroundColor: color,
+			    borderColor: color,
+		    };
 
-            this.state.datasets.push(newDataset);
+		    this.state.datasets = [...current, newDataset];
 
-			let chart = this.getChart();
+		    const chart = this.getChart();
 
-            if (chart) {
-                chart.data.datasets.push({
-                    ...newDataset,
-                    data: [...newDataset.data],
-                });
+		    if (chart) {
+			    chart.data.datasets = this.state.datasets.map(ds => ({ ...ds, data: [...ds.data] }));
+			    chart.update('resize');
+		    }
+	    },
 
-                chart.update('resize');
-            }
-        },
+	    removeDataset(index) {
+		    if (!Array.isArray(this.state.datasets) || this.state.datasets.length <= 1) return;
 
-        removeDataset(index) {
-            if (!Array.isArray(this.state.datasets) || this.state.datasets.length <= 1) return;
+		    const copy = [...this.state.datasets];
+		    copy.splice(index, 1);
+		    this.state.datasets = copy;
 
-            this.state.datasets.splice(index, 1);
+		    const chart = this.getChart();
 
-			let chart = this.getChart();
-
-            if (chart) {
-                chart.data.datasets = this.state.datasets.map(ds => ({
-                    ...ds,
-                    data: Array.isArray(ds.data) ? [...ds.data] : []
-                }));
-
-                chart.update('resize');
-            }
-        },
+		    if (chart) {
+			    chart.data.datasets = this.state.datasets.map(ds => ({ ...ds, data: [...ds.data] }));
+			    chart.update('resize');
+		    }
+	    },
 
         capitalizeFirst(string) {
             return string.charAt(0).toUpperCase() + string.slice(1);
