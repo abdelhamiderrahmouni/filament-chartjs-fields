@@ -4,12 +4,12 @@ namespace AbdelhamidErrahmouni\ChartBuilder\DataObjects;
 
 use Illuminate\Contracts\Support\Arrayable;
 
-class ChartData implements Arrayable
+final class ChartData implements Arrayable
 {
     public function __construct(
         public string $type,
         public array $labels,
-        /** @var Dataset[] */
+        /** @var array<int, Dataset|array> */
         public array $datasets,
         public ?array $options = null,
     ) {

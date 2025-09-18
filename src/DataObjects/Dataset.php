@@ -4,7 +4,7 @@ namespace AbdelhamidErrahmouni\ChartBuilder\DataObjects;
 
 use Illuminate\Contracts\Support\Arrayable;
 
-class Dataset implements Arrayable
+final class Dataset implements Arrayable
 {
     public function __construct(
         public string $label,
