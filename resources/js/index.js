@@ -42,7 +42,7 @@ export default function chartBuilder({
         },
 
         initializeDatasets() {
-            const labelsCount = this.getLabelsCount();
+            const labelsCount = this.state.labels.length;
 
             if (labelsCount > 0) {
                 this.state.datasets.forEach(dataset => {
@@ -65,10 +65,6 @@ export default function chartBuilder({
                 chart.data.datasets[datasetIndex].data[labelIndex] = Number(value) || 0;
                 chart.update('none');
             }
-        },
-
-        getLabelsCount() {
-            return this.parseLabels(this.state.labels).length;
         },
 
         addLabel() {
@@ -135,7 +131,7 @@ export default function chartBuilder({
             const nextIndex = this.state.datasets.length;
             const palette = Array.isArray(defaultColors) && defaultColors.length ? defaultColors : ['#3b82f6', '#10b981', '#f59e0b', '#ef4444'];
             const colorIndex = nextIndex % palette.length;
-            const labelsCount = this.getLabelsCount();
+            const labelsCount = this.state.labels.length;
 
             const newDataset = {
                 label: `Dataset ${nextIndex + 1}`,
@@ -168,11 +164,6 @@ export default function chartBuilder({
                 }));
                 chart.update('none');
             }
-        },
-
-        parseLabels(labels) {
-            if (!labels || !Array.isArray(labels)) return [];
-            return labels.filter(label => label && String(label).trim());
         },
 
         capitalizeFirst(string) {
