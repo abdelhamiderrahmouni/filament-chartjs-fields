@@ -23,9 +23,6 @@ export default function chartBuilder({
         }]
     }
 
-
-    let chart = null;
-
     return {
         state: state || baseEmptyChart,
         chartTypes: chartTypes || ['line', 'bar', 'pie'],
@@ -54,16 +51,20 @@ export default function chartBuilder({
         },
 
         handleLabelsChange(labelIndex, value) {
+			let chart = this.getChart();
+
             if (chart) {
                 chart.data.labels[labelIndex] = value;
-                chart.update('none');
+                chart.update('resize');
             }
         },
 
         handleDatasetDataChange(datasetIndex, labelIndex, value) {
+			let chart = this.getChart();
+
             if (chart && chart.data.datasets[datasetIndex]) {
                 chart.data.datasets[datasetIndex].data[labelIndex] = Number(value) || 0;
-                chart.update('none');
+                chart.update('resize');
             }
         },
 
@@ -86,6 +87,8 @@ export default function chartBuilder({
                 return { ...dataset, data: [...data, 0] };
             });
 
+			let chart = this.getChart();
+
             if (chart) {
                 chart.data.labels.push(newLabel);
                 chart.data.datasets.map(dataset => {
@@ -96,7 +99,7 @@ export default function chartBuilder({
                     return dataset;
                 });
 
-                chart.update('none');
+                chart.update('resize');
             }
         },
 
@@ -111,6 +114,8 @@ export default function chartBuilder({
                 });
             }
 
+			let chart = this.getChart();
+
             if (chart) {
                 chart.data.labels.splice(index, 1);
                 chart.data.datasets.forEach(dataset => {
@@ -119,17 +124,19 @@ export default function chartBuilder({
                     }
                 });
 
-                chart.update('none');
+                chart.update('resize');
             }
         },
 
         addDataset() {
-            if (!this.state.datasets) {
+            if (! this.state.datasets) {
                 this.state.datasets = [];
             }
 
             const nextIndex = this.state.datasets.length;
-            const palette = Array.isArray(defaultColors) && defaultColors.length ? defaultColors : ['#3b82f6', '#10b981', '#f59e0b', '#ef4444'];
+            const palette = Array.isArray(defaultColors) && defaultColors.length
+	            ? defaultColors
+	            : ['#3b82f6', '#10b981', '#f59e0b', '#ef4444'];
             const colorIndex = nextIndex % palette.length;
             const labelsCount = this.state.labels.length;
 
@@ -142,13 +149,15 @@ export default function chartBuilder({
 
             this.state.datasets.push(newDataset);
 
+			let chart = this.getChart();
+
             if (chart) {
                 chart.data.datasets.push({
                     ...newDataset,
                     data: [...newDataset.data],
                 });
 
-                chart.update('none');
+                chart.update('resize');
             }
         },
 
@@ -157,12 +166,15 @@ export default function chartBuilder({
 
             this.state.datasets.splice(index, 1);
 
+			let chart = this.getChart();
+
             if (chart) {
                 chart.data.datasets = this.state.datasets.map(ds => ({
                     ...ds,
                     data: Array.isArray(ds.data) ? [...ds.data] : []
                 }));
-                chart.update('none');
+
+                chart.update('resize');
             }
         },
 
@@ -178,36 +190,88 @@ export default function chartBuilder({
             this.$nextTick(() => {
                 this.destroyChart();
 
-                const canvas = this.$refs.canvas;
-                if (!canvas) return;
+                if (! this.$refs.canvas) return;
 
-                let state = window.Alpine.raw(this.state);
+                const allowedTypes = ['line','bar','pie','doughnut','polarArea','radar','scatter','bubble'];
 
-                chart = new Chart(canvas, {
+                const state = window.Alpine.raw(this.state) || {};
+                if (!state.type || !allowedTypes.includes(state.type)) state.type = 'line';
+                if (!Array.isArray(state.labels)) state.labels = [''];
+                if (!Array.isArray(state.datasets)) state.datasets = [];
+
+                state.datasets = state.datasets.map(ds => {
+                    const copy = { ...ds };
+                    if (!Array.isArray(copy.data)) copy.data = Array(state.labels.length).fill(0);
+                    if (copy.type && !allowedTypes.includes(copy.type)) delete copy.type;
+                    return copy;
+                });
+
+                const existing = this.getChart();
+                if (existing) existing.destroy();
+
+	            Chart.defaults.animation.duration = 0
+
+	            Chart.defaults.backgroundColor = getComputedStyle(
+		            this.$refs.backgroundColorElement,
+	            ).color
+
+	            const borderColor = getComputedStyle(
+		            this.$refs.borderColorElement,
+	            ).color
+
+	            Chart.defaults.borderColor = borderColor
+
+	            Chart.defaults.color = getComputedStyle(
+		            this.$refs.textColorElement,
+	            ).color
+
+	            Chart.defaults.font.family = getComputedStyle(this.$el).fontFamily
+
+	            Chart.defaults.plugins.legend.labels.boxWidth = 12
+	            Chart.defaults.plugins.legend.position = 'bottom'
+
+	            const gridColor = getComputedStyle(
+		            this.$refs.gridColorElement,
+	            ).color
+
+				let options = window.Alpine.raw(this.options);
+	            options.responsive ??= window.Alpine.raw(this.responsive);
+	            options.maintainAspectRatio ??= window.Alpine.raw(this.maintainAspectRatio);
+	            options.animation ??= {};
+				options.animation.duration ??= 0;
+	            options.plugins ??= {};
+	            options.plugins.legend ??= {};
+				options.plugins.legend.display ??= true;
+
+                new Chart(this.$refs.canvas, {
                     type: state.type,
                     data: {
                         labels: state.labels,
                         datasets: state.datasets
                     },
-                    options: {
-                        ...window.Alpine.raw(this.options),
-                        responsive: window.Alpine.raw(this.responsive),
-                        maintainAspectRatio: window.Alpine.raw(this.maintainAspectRatio),
-                        animation: { duration: 0 },
-                        plugins: { legend: { display: true } },
-                    },
+                    options: options,
+	                plugins: window.filamentChartJsPlugins ?? [],
                 })
             });
         },
+
+	    getChart: function () {
+		    if (! this.$refs.canvas) {
+			    return null
+		    }
+
+		    return Chart.getChart(this.$refs.canvas)
+	    },
 
         refreshChart() {
             this.initializeChart();
         },
 
         destroyChart() {
+	        let chart = this.getChart();
+
             if (chart) {
                 chart.destroy();
-                chart = null;
             }
         },
 

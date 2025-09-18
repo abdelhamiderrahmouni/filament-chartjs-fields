@@ -28,11 +28,11 @@
 
         <div class="fi-chart-builder-content grid" x-ref="chart_builder_content">
             <!-- Chart Configurator Form -->
-            <div class="w-full relative bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
+            <div class="w-full relative rounded-lg border border-gray-200 dark:border-gray-700 p-4">
                 <div class="flex justify-between items-center mb-4">
                     <div class="w-full space-y-2">
                         <label class="block text-sm font-medium text-gray-600 dark:text-gray-400">
-                            {{ __("filament-chartjs-fields::chartjs-fields.type") }}
+                            {{ __("filament-chartjs-fields::common.type") }}
                         </label>
                         <select
                             x-model="state.type"
@@ -54,7 +54,7 @@
                             x-bind:style="`grid-template-columns: 2fr repeat(${(state.datasets || []).length}, minmax(0, 1fr));`"
                         >
                             <label class="block text-sm font-medium text-gray-600 dark:text-gray-400">
-                                {{ __("filament-chartjs-fields::chartjs-fields.labels") }}
+                                {{ __("filament-chartjs-fields::common.labels") }}
                             </label>
                             <template x-for="(dataset, datasetIndex) in (state.datasets || [])" x-bind:key="datasetIndex">
                                 <label class="relative">
@@ -69,7 +69,8 @@
                                             type="button"
                                             x-on:click="removeDataset(datasetIndex)"
                                             x-show="state.datasets && state.datasets.length > 1"
-                                            class="text-red-500 hover:text-red-700 focus:outline-none text-sm p-1"
+                                            class="text-custom-500 hover:text-custom-700 focus:outline-none text-sm p-1"
+                                            style="--c-500: var(--danger-500); --c-700: var(--danger-700);"
                                         >
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
@@ -111,7 +112,7 @@
                                                 x-model="state.labels[labelIndex]"
                                                 @input.debounce.250ms="handleLabelsChange(labelIndex, $event.target.value)"
                                                 class="fi-input px-4 py-1.5 block w-full border-none text-sm text-gray-950 placeholder:text-gray-400 focus:ring-0 disabled:text-gray-500 disabled:[-webkit-text-fill-color:theme(colors.gray.500)] disabled:placeholder:[-webkit-text-fill-color:theme(colors.gray.400)] dark:text-white dark:placeholder:text-gray-500 dark:disabled:text-gray-400 dark:disabled:[-webkit-text-fill-color:theme(colors.gray.400)] dark:disabled:placeholder:[-webkit-text-fill-color:theme(colors.gray.500)] sm:text-sm sm:leading-6 bg-white/0"
-                                                x-bind:placeholder="`{{ __("filament-chartjs-fields::chartjs-fields.label") }} ${labelIndex + 1}`"
+                                                x-bind:placeholder="`{{ __("filament-chartjs-fields::common.label") }} ${labelIndex + 1}`"
                                             />
                                         </div>
                                     </div>
@@ -181,7 +182,8 @@
                                         type="button"
                                         x-on:click="removeLabel(labelIndex)"
                                         x-show="state.labels && state.labels.length > 1"
-                                        class="text-red-500 hover:text-red-700 focus:outline-none text-sm p-1"
+                                        class="text-custom-500 hover:text-custom-700 focus:outline-none text-sm p-1"
+                                        style="--c-500: var(--danger-500); --c-700: var(--danger-700);"
                                     >
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
@@ -199,7 +201,7 @@
                                 <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                                 </svg>
-                                {{ __("filament-chartjs-fields::chartjs-fields.add_label") }}
+                                {{ __("filament-chartjs-fields::common.add_label") }}
                             </button>
                         </div>
                     </div>
@@ -207,17 +209,17 @@
             </div>
 
             <!-- Chart Preview -->
-            <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
+            <div class="rounded-lg border border-gray-200 dark:border-gray-700 p-4">
                 <div class="flex items-center justify-between mb-4">
                     <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">
-                        {{ __("filament-chartjs-fields::chartjs-fields.preview") }}
+                        {{ __("filament-chartjs-fields::common.preview") }}
                     </h3>
                     <div class="flex items-center gap-2">
                         <button
                             type="button"
                             x-on:click="refreshChart()"
                             class="p-1.5 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 rounded focus:outline-none focus:ring-2 focus:ring-gray-500"
-                            title="{{ __("filament-chartjs-fields::chartjs-fields.") }}"
+                            title="{{ __("filament-chartjs-fields::common.refresh_chart") }}"
                         >
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
@@ -225,7 +227,7 @@
                         </button>
                         <span
                             class="text-xs text-gray-500 dark:text-gray-400"
-                            x-text="state.type ? state.type.toUpperCase() : '{{ __('filament-chartjs-fields::chartjs-fields.chart') }}'"
+                            x-text="state.type ? state.type.toUpperCase() : '{{ __('filament-chartjs-fields::common.chart') }}'"
                         ></span>
                     </div>
                 </div>
@@ -237,6 +239,10 @@
                 >
                     <div class="w-full h-full">
                         <canvas x-ref="canvas" class="w-full h-full"></canvas>
+                        <span x-ref="backgroundColorElement" class="text-custom-50 dark:text-custom-400/10"></span>
+                        <span x-ref="borderColorElement" class="text-gray-400"></span>
+                        <span x-ref="gridColorElement" class="text-gray-200 dark:text-gray-800"></span>
+                        <span x-ref="textColorElement" class="text-gray-500 dark:text-gray-400"></span>
                     </div>
 
                     {{--<div class="flex items-center justify-center h-64 text-gray-400 dark:text-gray-500">

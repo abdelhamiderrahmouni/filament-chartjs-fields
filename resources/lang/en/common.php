@@ -1,6 +1,5 @@
 <?php
 
-// translations for AbdelhamidErrahmouni/ChartBuilder
 return [
     'type' => 'Type',
     'label' => 'Label',
@@ -12,4 +11,10 @@ return [
     'preview' => 'Preview',
     'refresh_chart' => 'Refresh the chart', // filament-chartjs-fields::common.
     'chart' => 'Chart',
+    'bar' => 'Bar',
+    'line' => 'Line',
+    'pie' => 'Pie',
+    'doughnut' => 'Doughnut',
+    'radar' => 'Radar',
+    'polarArea' => 'Polar Area',
 ];
