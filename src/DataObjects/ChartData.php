@@ -12,16 +12,14 @@ final class ChartData implements Arrayable
         /** @var array<int, Dataset|array> */
         public array $datasets,
         public ?array $options = null,
-    ) {
-    }
+    ) {}
 
     public static function make(
         string $type,
         array $labels,
         array $datasets,
         ?array $options = null,
-    ): self
-    {
+    ): self {
         return new self($type, $labels, $datasets, $options);
     }
 
@@ -31,7 +29,7 @@ final class ChartData implements Arrayable
             'type' => $this->type,
             'labels' => $this->labels,
             'datasets' => array_map(
-                fn($dataset) => $dataset instanceof Arrayable ? $dataset->toArray(): $dataset,
+                fn ($dataset) => $dataset instanceof Arrayable ? $dataset->toArray() : $dataset,
                 $this->datasets
             ),
             'options' => $this->options,

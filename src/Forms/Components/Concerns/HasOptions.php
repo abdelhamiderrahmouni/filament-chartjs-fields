@@ -65,7 +65,7 @@ trait HasOptions
                             let parts = longText.match(/.{1,20}/g);
                             return parts;
                         }',
-                    ]
+                    ],
                 ],
             ],
             'scales' => [

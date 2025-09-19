@@ -9,12 +9,12 @@ use Filament\Support\Concerns\HasExtraAlpineAttributes;
 
 class ChartBuilder extends Field
 {
-    use HasExtraAlpineAttributes;
-    use Concerns\HasOptions;
-    use Concerns\HasTypes;
-    use Concerns\HasHeightControls;
     use Concerns\CanBeResponsive;
     use Concerns\CanMaintainAspectRatio;
+    use Concerns\HasHeightControls;
+    use Concerns\HasOptions;
+    use Concerns\HasTypes;
+    use HasExtraAlpineAttributes;
 
     protected string $view = 'filament-chartjs-fields::forms.components.chart-builder';
 
@@ -27,12 +27,13 @@ class ChartBuilder extends Field
     {
         parent::setUp();
 
-        $this->default(fn (): array => ChartData::make(
+        $this->default(
+            fn (): array => ChartData::make(
                 type: $this->getDefaultChartType(),
-                labels: [__("filament-chartjs-fields::common.label") . ' 1'],
+                labels: [__('filament-chartjs-fields::common.label') . ' 1'],
                 datasets: [
                     Dataset::make(
-                        label: __("filament-chartjs-fields::common.dataset") . ' 1',
+                        label: __('filament-chartjs-fields::common.dataset') . ' 1',
                         data: [0],
                         backgroundColor: $this->defaultColors[0],
                         borderColor: $this->defaultColors[0],

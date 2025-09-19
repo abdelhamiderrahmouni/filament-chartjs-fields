@@ -25,8 +25,7 @@ final class Dataset implements Arrayable
         // public ?int $pointHoverRadius = null,
         // public ?string $yAxisID = null,
         // public ?string $xAxisID = null,
-    )
-    {}
+    ) {}
 
     public static function make(
         string $label,
@@ -46,9 +45,8 @@ final class Dataset implements Arrayable
         // ?int $pointHoverRadius = null,
         // ?string $yAxisID = null,
         // ?string $xAxisID = null,
-    ): self
-    {
-        return new static($label, $data, $backgroundColor, $borderColor);
+    ): self {
+        return new self($label, $data, $backgroundColor, $borderColor);
     }
 
     public function toArray(): array
