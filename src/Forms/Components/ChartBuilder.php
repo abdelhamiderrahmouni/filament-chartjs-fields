@@ -89,4 +89,12 @@ class ChartBuilder extends Field
 
         return $this->options($options);
     }
+
+	public function getTranslatedWords()
+	{
+		return [
+			'dataset' => __('filament-chartjs-fields::common.dataset'),
+			'label' => __('filament-chartjs-fields::common.label'),
+		];
+	}
 }

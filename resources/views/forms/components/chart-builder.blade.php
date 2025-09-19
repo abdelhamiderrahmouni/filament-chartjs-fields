@@ -9,7 +9,8 @@
             minHeight: '{{ $getMinHeight() }}',
             defaultColors: @js($getDefaultColors()),
             responsive: @js($isResponsive()),
-            maintainAspectRatio: @js($shouldMaintainAspectRatio())
+            maintainAspectRatio: @js($shouldMaintainAspectRatio()),
+            translatedWords: @js($getTranslatedWords())
         })"
           class="fi-chart-builder"
           x-ref="chart_builder"

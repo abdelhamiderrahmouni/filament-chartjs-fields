@@ -9,14 +9,15 @@ export default function chartBuilder({
         minHeight,
         defaultColors,
         responsive,
-        maintainAspectRatio
+        maintainAspectRatio,
+		translatedWords
     }) {
 
     const baseEmptyChart = {
         type: (chartTypes && chartTypes[0]) || 'line',
         labels: [''],
         datasets: [{
-            label: 'Dataset 1',
+            label: `${translatedWords.dataset} 1`,
             data: [0],
             backgroundColor: (defaultColors && defaultColors[0]) || '#3b82f6',
             borderColor: (defaultColors && defaultColors[0]) || '#3b82f6',
@@ -72,7 +73,7 @@ export default function chartBuilder({
 		    if (!Array.isArray(this.state.labels)) this.state.labels = [];
 		    if (!Array.isArray(this.state.datasets)) this.state.datasets = [];
 
-		    const newLabel = `Étiquette ${this.state.labels.length + 1}`;
+		    const newLabel = `${translatedWords.label} ${this.state.labels.length + 1}`;
 
 		    this.state.labels = [...this.state.labels, newLabel];
 
@@ -125,7 +126,7 @@ export default function chartBuilder({
 		    const labelsCount = Array.isArray(this.state.labels) ? this.state.labels.length : 0;
 
 		    const newDataset = {
-			    label: `Dataset ${nextIndex + 1}`,
+			    label: `${translatedWords.dataset} ${nextIndex + 1}`,
 			    data: Array(labelsCount).fill(0),
 			    backgroundColor: color,
 			    borderColor: color,
