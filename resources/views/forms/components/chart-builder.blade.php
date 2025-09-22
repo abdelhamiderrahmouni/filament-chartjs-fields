@@ -65,18 +65,59 @@
                                         class="max-w-full border-none p-0 focus:ring-0 text-sm font-medium text-gray-600 dark:text-gray-400"
                                     />
 
-                                    <div class="absolute right-0 top-0 h-full flex items-center gap-1 bg-white dark:bg-gray-800">
+                                    <div class="absolute right-0 top-0 h-full flex items-center gap-1 bg-white dark:bg-gray-800" x-data="{ modalOpen: false }">
                                         <button
                                             type="button"
-                                            x-on:click="removeDataset(datasetIndex)"
-                                            x-show="state.datasets && state.datasets.length > 1"
+                                            x-on:click="modalOpen = true"
                                             class="text-custom-500 hover:text-custom-700 focus:outline-none text-sm p-1"
                                             style="--c-500: var(--danger-500); --c-700: var(--danger-700);"
                                         >
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                            <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                                <path d="M4 6h16" />
+                                                <path d="M7 12h13" />
+                                                <path d="M10 18h10" />
                                             </svg>
                                         </button>
+                                        <div
+                                            class="absolute top-0 right-0 z-50 shadow rounded min-w-48 bg-white p-3 border"
+                                            x-show="modalOpen"
+                                            x-on:click.away="modalOpen = false"
+                                            x-cloak
+                                        >
+                                            <ul class="flex flex-col gap-2">
+                                                <li class="flex-1 flex flex-col">
+                                                    <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                                                        Couleur de fond
+                                                    </label>
+                                                    <div class="flex items-center gap-1" x-on:click.stop>
+                                                        <x-filament-chartjs-fields::color-picker x-model="dataset.backgroundColor" />
+                                                    </div>
+                                                </li>
+                                                <li class="flex-1 flex flex-col">
+                                                    <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                                                        Couleur de bordure
+                                                    </label>
+                                                    <div class="flex items-center gap-1" x-on:click.stop>
+                                                        <x-filament-chartjs-fields::color-picker x-model="dataset.borderColor" />
+                                                    </div>
+                                                </li>
+                                                <li>
+                                                    <button
+                                                        type="button"
+                                                        x-on:click="modalOpen = false; removeDataset(datasetIndex)"
+                                                        x-show="state.datasets && state.datasets.length > 1"
+                                                        class="w-full rounded-lg px-2 py-1.5 bg-custom-50 text-custom-500 hover:text-custom-700 focus:outline-none text-sm p-1 flex items-center gap-1"
+                                                        style="--c-50: var(--danger-50); --c-500: var(--danger-500); --c-700: var(--danger-700);"
+                                                    >
+                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                                        </svg>
+                                                        <span>Delete</span>
+                                                    </button>
+                                                </li>
+                                            </ul>
+                                        </div>
                                     </div>
                                 </label>
                             </template>
@@ -131,50 +172,6 @@
                                                     </div>
                                                 </div>
                                             </div>
-
-                                            {{-- <div class="flex gap-2">
-                                                <div class="flex-1 flex flex-col gap-1">
-                                                    <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
-                                                        Couleur de fond
-                                                    </label>
-                                                    <div class="flex items-center gap-1">
-                                                        <input type="color"
-                                                               x-model="dataset.backgroundColor"
-                                                               @input="refreshChart()"
-                                                               class="color-input flex-shrink-0 rounded border border-gray-300 dark:border-gray-600 cursor-pointer">
-                                                        <div class="fi-input-wrp flex rounded-lg shadow-sm ring-1 transition duration-75 bg-white dark:bg-white/5 [&:not(:has(.fi-ac-action:focus))]:focus-within:ring-2 fi-fo-text-input overflow-hidden ring-gray-950/10 dark:ring-white/20 [&:not(:has(.fi-ac-action:focus))]:focus-within:ring-primary-600 dark:[&:not(:has(.fi-ac-action:focus))]:focus-within:ring-primary-500">
-                                                            <div class="fi-input-wrp-input min-w-0 flex-1">
-                                                                <input type="text"
-                                                                       x-model="dataset.backgroundColor"
-                                                                       @input.debounce.500ms="refreshChart()"
-                                                                       class="fi-input px-2 py-0.5 block w-full border-none text-sm text-gray-950 placeholder:text-gray-400 focus:ring-0 disabled:text-gray-500 disabled:[-webkit-text-fill-color:theme(colors.gray.500)] disabled:placeholder:[-webkit-text-fill-color:theme(colors.gray.400)] dark:text-white dark:placeholder:text-gray-500 dark:disabled:text-gray-400 dark:disabled:[-webkit-text-fill-color:theme(colors.gray.400)] dark:disabled:placeholder:[-webkit-text-fill-color:theme(colors.gray.500)] sm:text-sm sm:leading-6 bg-white/0"
-                                                                       placeholder="e.g. 10, 20, 30, 40">
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                <div class="flex-1 flex flex-col gap-1" x-show="state.type && !['pie', 'doughnut'].includes(state.type)">
-                                                    <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
-                                                        Couleur de bordure
-                                                    </label>
-                                                    <div class="flex items-center gap-1">
-                                                        <input type="color"
-                                                               x-model="dataset.borderColor"
-                                                               @input="refreshChart()"
-                                                               class="color-input flex-shrink-0 rounded border border-gray-300 dark:border-gray-600 cursor-pointer">
-                                                        <div class="fi-input-wrp flex rounded-lg shadow-sm ring-1 transition duration-75 bg-white dark:bg-white/5 [&:not(:has(.fi-ac-action:focus))]:focus-within:ring-2 fi-fo-text-input overflow-hidden ring-gray-950/10 dark:ring-white/20 [&:not(:has(.fi-ac-action:focus))]:focus-within:ring-primary-600 dark:[&:not(:has(.fi-ac-action:focus))]:focus-within:ring-primary-500">
-                                                            <div class="fi-input-wrp-input min-w-0 flex-1">
-                                                                <input type="text"
-                                                                       x-model="dataset.borderColor"
-                                                                       @input.debounce.500ms="refreshChart()"
-                                                                       class="fi-input px-2 py-0.5 block w-full border-none text-sm text-gray-950 placeholder:text-gray-400 focus:ring-0 disabled:text-gray-500 disabled:[-webkit-text-fill-color:theme(colors.gray.500)] disabled:placeholder:[-webkit-text-fill-color:theme(colors.gray.400)] dark:text-white dark:placeholder:text-gray-500 dark:disabled:text-gray-400 dark:disabled:[-webkit-text-fill-color:theme(colors.gray.400)] dark:disabled:placeholder:[-webkit-text-fill-color:theme(colors.gray.500)] sm:text-sm sm:leading-6 bg-white/0"
-                                                                       placeholder="e.g. 10, 20, 30, 40">
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div> --}}
                                         </div>
                                     </template>
                                 </div>
