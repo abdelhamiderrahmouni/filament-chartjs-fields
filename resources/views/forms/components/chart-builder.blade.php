@@ -99,19 +99,12 @@
                                                         </label>
                                                         <div class="relative flex items-center px-3 py-1 rounded-lg" x-on:click.stop x-on:click="$refs.backgroundColor.click()"
                                                              x-bind:style="`background-color: ${dataset.backgroundColor}`">
-                                                            <x-filament::input type="color" class="absolute opacity-0" x-ref="backgroundColor" x-model="dataset.backgroundColor"/>
-                                                        </div>
-                                                    </div>
-                                                </x-filament::dropdown.list.item>
-                                                
-                                                <x-filament::dropdown.list.item>
-                                                    <div class="flex-1 flex gap-1 justify-between">
-                                                        <label class="block text-xs font-medium" x-bind:style="`color: bestGrayForBackground(dataset.borderColor)`">
-                                                            Couleur de bordure
-                                                        </label>
-                                                        <div class="relative flex items-center px-3 py-1 rounded-lg" x-on:click.stop x-on:click="$refs.borderColor.click()"
-                                                             x-bind:style="`background-color: ${dataset.borderColor}`">
-                                                            <x-filament::input type="color" class="absolute opacity-0" x-ref="borderColor" x-model="dataset.borderColor"/>
+                                                            <x-filament::input
+                                                                    type="color"
+                                                                    class="absolute opacity-0"
+                                                                    x-on:input="handleColorChange(datasetIndex, $event.target.value)"
+                                                                    x-ref="backgroundColor"
+                                                                    x-model="dataset.backgroundColor" />
                                                         </div>
                                                     </div>
                                                 </x-filament::dropdown.list.item>

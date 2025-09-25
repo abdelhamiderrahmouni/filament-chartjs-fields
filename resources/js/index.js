@@ -73,6 +73,21 @@ export default function chartBuilder({
             }
         },
 
+	    handleColorChange(datasetIndex, color) {
+		    let chart = this.getChart();
+
+			if (this.state.datasets[datasetIndex]) {
+			    this.state.datasets[datasetIndex].backgroundColor = color;
+			    this.state.datasets[datasetIndex].borderColor = color;
+		    }
+
+			if (chart && chart.data.datasets[datasetIndex]) {
+			    chart.data.datasets[datasetIndex].backgroundColor = color;
+			    chart.data.datasets[datasetIndex].borderColor = color;
+				chart.update('resize');
+		    }
+	    },
+
 	    addLabel() {
 		    if (!Array.isArray(this.state.labels)) this.state.labels = [];
 		    if (!Array.isArray(this.state.datasets)) this.state.datasets = [];
