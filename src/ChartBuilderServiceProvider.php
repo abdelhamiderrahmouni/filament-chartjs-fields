@@ -7,6 +7,7 @@ use AbdelhamidErrahmouni\ChartBuilder\Testing\TestsChartBuilder;
 use Filament\Support\Assets\AlpineComponent;
 use Filament\Support\Assets\Asset;
 use Filament\Support\Assets\Css;
+use Filament\Support\Assets\Js;
 use Filament\Support\Facades\FilamentAsset;
 use Filament\Support\Facades\FilamentIcon;
 use Illuminate\Filesystem\Filesystem;
@@ -14,7 +15,6 @@ use Livewire\Features\SupportTesting\Testable;
 use Spatie\LaravelPackageTools\Commands\InstallCommand;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
-use Filament\Support\Assets\Js;
 
 class ChartBuilderServiceProvider extends PackageServiceProvider
 {
@@ -91,8 +91,8 @@ class ChartBuilderServiceProvider extends PackageServiceProvider
         return [
             AlpineComponent::make('filament-chartjs-fields', __DIR__ . '/../resources/dist/components/filament-chartjs-fields.js'),
             Css::make('filament-chartjs-fields-styles', __DIR__ . '/../resources/dist/filament-chartjs-fields.css'),
-	        Js::make('coloris-js', 'https://cdn.jsdelivr.net/gh/mdbassit/Coloris@latest/dist/coloris.min.js'),
-	        Css::make('coloris-css', 'https://cdn.jsdelivr.net/gh/mdbassit/Coloris@latest/dist/coloris.min.css'),
+            Js::make('coloris-js', 'https://cdn.jsdelivr.net/gh/mdbassit/Coloris@latest/dist/coloris.min.js'),
+            Css::make('coloris-css', 'https://cdn.jsdelivr.net/gh/mdbassit/Coloris@latest/dist/coloris.min.css'),
         ];
     }
 
