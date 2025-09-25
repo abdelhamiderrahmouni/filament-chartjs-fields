@@ -10,7 +10,9 @@ export default function chartBuilder({
         defaultColors,
         responsive,
         maintainAspectRatio,
-		translatedWords
+		translatedWords,
+        showPreview,
+	    defaultView = 'grid'
     }) {
 
     const baseEmptyChart = {
@@ -33,6 +35,8 @@ export default function chartBuilder({
         responsive: responsive !== false,
         maintainAspectRatio: maintainAspectRatio !== false,
         chartUpdateTimeout: null,
+	    showPreview,
+	    defaultView,
 
         init() {
             this.initializeDatasets();

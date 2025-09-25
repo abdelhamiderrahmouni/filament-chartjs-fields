@@ -4,8 +4,14 @@
 
 .fi-chart-builder {
 
-    .fi-chart-builder-content {
-        @apply grid-cols-1 lg:grid-cols-2 gap-6;
+    .fi-chart-builder-content{
+        &.stack-view {
+            @apply flex flex-col;
+        }
+
+        &.two-column-grid {
+            @apply grid grid-cols-1 lg:grid-cols-2;
+        }
     }
 
     .color-input {
